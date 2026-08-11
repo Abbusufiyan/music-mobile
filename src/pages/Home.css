@@ -1,0 +1,140 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: #121619;
+    color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+.home-main {
+    min-height: 100vh;
+    width: 100%;
+    background-color: #121619;
+    padding-bottom: 30px;
+}
+
+/* DASHBOARD */
+.dashboard {
+    width: 100%;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 340px minmax(400px, 1fr) 350px;
+    gap: 20px;
+    align-items: start;
+}
+
+/* LEFT COLUMN */
+.left-column {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.small-player {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 10;
+}
+
+/* OPTION WHEEL */
+.option-wheel {
+    width: 100%;
+    height: 315px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wheel-text {
+    width: 0%;
+    height: 100%;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.wheel-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* MAIN CONTENT */
+.main-box {
+    background-color: #242c33;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: hidden;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.main-content {
+    width: 100%;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* RIGHT COLUMN */
+.right-column {
+    width: 350px;
+    position: relative;
+    z-index: 1;
+}
+
+.right-column-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: 300px minmax(350px, 1fr) 300px;
+        gap: 15px;
+        padding: 15px;
+    }
+    .left-column { width: 300px; }
+    .right-column { width: 300px; }
+}
+
+@media (max-width: 950px) {
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+    }
+    .left-column { width: 100%; grid-column: 1; }
+    .main-content { grid-column: 2; grid-row: 1 / span 2; }
+    .right-column { width: 100%; grid-column: 1; }
+}
+
+@media (max-width: 700px) {
+    .dashboard {
+        display: flex;
+        flex-direction: column;
+        padding: 12px;
+    }
+    .left-column, .right-column, .main-content { width: 100%; }
+}

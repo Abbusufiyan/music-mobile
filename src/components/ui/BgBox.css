@@ -1,0 +1,13 @@
+.bg-box {
+  width: 300px;
+  min-height: 150px;
+
+  background: #464858;
+  border-radius: 12px;
+
+  padding: 20px;
+
+  color: white;
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}

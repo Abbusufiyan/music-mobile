@@ -1,0 +1,135 @@
+.trending-page {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #273338;
+  color: #ffffff;
+  padding-bottom: 40px;
+}
+
+.trending-main {
+  width: calc(100% - 24px);
+  margin: 0 auto;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.trending-hero {
+  padding: 36px 32px;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.4) 0%, rgba(245, 158, 11, 0.3) 100%), #3a3d4a;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(236, 72, 153, 0.2);
+  border: 1px solid rgba(236, 72, 153, 0.4);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f472b6;
+  margin-bottom: 12px;
+}
+
+.trending-hero h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.trending-hero p {
+  color: #cbd5e1;
+  font-size: 1rem;
+  max-width: 600px;
+}
+
+.trending-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trending-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 20px;
+  background: #3a3d4a;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.trending-row:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.trend-rank {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 50px;
+}
+
+.rank-num {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #ec4899;
+}
+
+.fire-icon {
+  color: #f59e0b;
+}
+
+.trend-cover {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.trend-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.trend-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.trend-artist {
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.trend-stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #818cf8;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  width: 140px;
+}
+
+.trend-play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}

@@ -1,0 +1,157 @@
+.playlists-page {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #273338;
+  color: #ffffff;
+  padding-bottom: 40px;
+}
+
+.playlists-main {
+  width: calc(100% - 24px);
+  margin: 0 auto;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.playlists-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  background: #3a3d4a;
+  border-radius: 16px;
+}
+
+.playlists-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.playlists-header p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.create-playlist-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.playlists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.playlist-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.playlist-cover-wrapper {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pl-big-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pl-hover-play {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ec4899;
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.5);
+}
+
+.pl-details h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.pl-details p {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.pl-meta {
+  font-size: 0.78rem;
+  color: #a5b4fc;
+  font-weight: 600;
+}
+
+.recent-activity h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.recent-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #3a3d4a;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.item-icon {
+  color: #ec4899;
+}
+
+.item-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+
+  flex: 1;
+}
+
+.item-artist {
+  color: #94a3b8;
+  font-size: 0.88rem;
+  width: 150px;
+}
+
+.item-time {
+  color: #64748b;
+  font-size: 0.8rem;
+}
