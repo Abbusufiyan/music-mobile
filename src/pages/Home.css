@@ -16,6 +16,7 @@ body {
     width: 100%;
     background-color: #121619;
     padding-bottom: 30px;
+    overflow-x: hidden;
 }
 
 /* DASHBOARD */
@@ -26,6 +27,43 @@ body {
     grid-template-columns: 340px minmax(400px, 1fr) 350px;
     gap: 20px;
     align-items: start;
+}
+
+/* SHARED BOX STYLES */
+.home-box {
+    width: 100%;
+    background-color: #1e252a;
+    border-radius: 14px;
+    padding: 16px;
+    color: white;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.home-box--player {
+    height: 150px;
+    padding: 10px 12px;
+}
+
+.home-box--wheel {
+    height: 350px;
+}
+
+.home-box--sidebar {
+    height: 284px;
+}
+
+.home-box--main {
+    height: 814px;
+    padding: 20px;
+}
+
+.home-box--eq {
+    height: 395px;
+}
+
+.home-box--lyrics {
+    height: 404px;
 }
 
 /* LEFT COLUMN */
@@ -46,7 +84,6 @@ body {
     z-index: 10;
 }
 
-/* OPTION WHEEL */
 .option-wheel {
     width: 100%;
     height: 315px;
@@ -128,6 +165,11 @@ body {
     .left-column { width: 100%; grid-column: 1; }
     .main-content { grid-column: 2; grid-row: 1 / span 2; }
     .right-column { width: 100%; grid-column: 1; }
+
+    .home-box--main {
+        height: auto;
+        min-height: 600px;
+    }
 }
 
 @media (max-width: 700px) {
@@ -135,6 +177,70 @@ body {
         display: flex;
         flex-direction: column;
         padding: 12px;
+        gap: 14px;
     }
-    .left-column, .right-column, .main-content { width: 100%; }
+
+    .left-column,
+    .right-column,
+    .main-content {
+        width: 100%;
+    }
+
+    .home-box--player {
+        height: auto;
+        min-height: 140px;
+    }
+
+    .home-box--wheel {
+        height: 280px;
+    }
+
+    .home-box--sidebar {
+        height: auto;
+        min-height: 240px;
+    }
+
+    .home-box--main {
+        height: auto;
+        min-height: unset;
+        padding: 14px;
+    }
+
+    .home-box--eq {
+        height: auto;
+        min-height: 320px;
+    }
+
+    .home-box--lyrics {
+        height: auto;
+        min-height: 300px;
+    }
+
+    .main-box {
+        padding: 14px;
+        gap: 14px;
+    }
+
+    .option-wheel {
+        height: 240px;
+    }
+
+    .wheel-text {
+        margin-left: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard {
+        padding: 10px;
+    }
+
+    .home-box {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .main-box {
+        padding: 12px;
+    }
 }

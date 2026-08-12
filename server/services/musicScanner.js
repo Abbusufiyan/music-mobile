@@ -2,7 +2,14 @@ import fs from "fs";
 import path from "path";
 import { getPool, isDbConnected } from "../config/db.js";
 
-export const LOCAL_MUSIC_DIR = "/home/omr/Music/Fuck upp/";
+export const MUSIC_FOLDERS = {
+  fuckupp: "/home/omr/Music/Fuck upp/",
+  nfak: "/home/omr/Music/NFAK/",
+};
+
+export const LOCAL_MUSIC_DIR = MUSIC_FOLDERS.fuckupp;
+
+const BASE_URL = "http://localhost:5000";
 
 export const ONLINE_LYRICS_MAP = {
   "1. Main Woh Chaand": [
@@ -74,7 +81,7 @@ export const ONLINE_LYRICS_MAP = {
   "10. Khat": [
     "Khat jo likhe the maine tere naam ke",
     "Kaagaz woh saare purane ho gaye",
-    "Yaadon ke mausam सुहाने ho gaye",
+    "Yaadon ke mausam suhaane ho gaye",
     "Tujhko pukare dil mera har pal",
     "Lauta de mere woh kal..."
   ],
@@ -144,64 +151,79 @@ export const ONLINE_LYRICS_MAP = {
   ]
 };
 
-export function scanLocalMusicFiles() {
-  const songsList = [];
-  try {
-    if (!fs.existsSync(LOCAL_MUSIC_DIR)) {
-      console.warn(`[Scanner] Music dir ${LOCAL_MUSIC_DIR} not found.`);
-      return songsList;
+function guessArtist(cleanName, folderKey) {
+  if (folderKey === "nfak") return "Nusrat Fateh Ali Khan";
+  if (cleanName.includes("Baarishein")) return "Anuv Jain";
+  if (cleanName.includes("Tum Se Hi")) return "Mohit Chauhan";
+  if (cleanName.includes("Nadaan Parinde") || cleanName.includes("Tum Ho")) return "A.R. Rahman & Mohit Chauhan";
+  if (cleanName.includes("Jeena Jeena")) return "Atif Aslam";
+  if (cleanName.includes("Aadat")) return "Atif Aslam / Jal";
+  if (cleanName.includes("Ae Dil Hai Mushkil")) return "Arijit Singh";
+  if (cleanName.includes("Samjhawan")) return "Arijit Singh & Shreya Ghoshal";
+  return "Bollywood / Local Artist";
+}
+
+function matchLyrics(cleanName) {
+  for (const k of Object.keys(ONLINE_LYRICS_MAP)) {
+    if (cleanName.includes(k) || k.includes(cleanName)) {
+      return ONLINE_LYRICS_MAP[k];
     }
+  }
+  return [
+    `Playing ${cleanName}`,
+    "Enjoy your music with high fidelity audio",
+    "Lyrics synchronized from local library"
+  ];
+}
 
-    const files = fs.readdirSync(LOCAL_MUSIC_DIR).filter(f => f.toLowerCase().endsWith(".mp3"));
+function buildAudioUrl(folderKey, fileName) {
+  return `${BASE_URL}/api/songs/stream/${folderKey}/${encodeURIComponent(fileName)}`;
+}
 
-    files.forEach((file, idx) => {
-      const cleanName = path.basename(file, ".mp3");
-      // Extract title and artist
-      let title = cleanName;
-      let artist = "Arijit Singh / Local Artist";
-
-      if (cleanName.includes("Baarishein")) artist = "Anuv Jain";
-      else if (cleanName.includes("Tum Se Hi")) artist = "Mohit Chauhan";
-      else if (cleanName.includes("Nadaan Parinde") || cleanName.includes("Tum Ho")) artist = "A.R. Rahman & Mohit Chauhan";
-      else if (cleanName.includes("Jeena Jeena")) artist = "Atif Aslam";
-      else if (cleanName.includes("Aadat")) artist = "Atif Aslam / Jal";
-      else if (cleanName.includes("Ae Dil Hai Mushkil")) artist = "Arijit Singh";
-      else if (cleanName.includes("Samjhawan")) artist = "Arijit Singh & Shreya Ghoshal";
-
-      // Match online lyrics
-      let lyrics = ONLINE_LYRICS_MAP[cleanName] || [
-        `Playing ${title}`,
-        "Online lyrics synchronized...",
-        "Enjoy your peace with high fidelity audio sound"
-      ];
-
-      // Key lookup
-      for (const k of Object.keys(ONLINE_LYRICS_MAP)) {
-        if (cleanName.includes(k) || k.includes(cleanName)) {
-          lyrics = ONLINE_LYRICS_MAP[k];
-          break;
-        }
-      }
-
-      songsList.push({
-        id: idx + 1,
-        title: title,
-        artist: artist,
-        album: "Bollywood Hits",
-        duration: "4:15",
-        fileName: file,
-        audioUrl: `/api/songs/stream/${encodeURIComponent(file)}`,
-        genre: idx % 2 === 0 ? "Indie / Acoustic" : "Bollywood Romantic",
-        bpm: 95 + (idx * 3) % 40,
-        releaseYear: 2015 + (idx % 9),
-        lyrics: lyrics
-      });
-    });
-
-    console.log(`[Scanner] Successfully indexed ${songsList.length} local MP3 tracks from ${LOCAL_MUSIC_DIR}`);
-  } catch (err) {
-    console.error("[Scanner] Error reading local music files:", err.message);
+function scanFolder(folderKey, dirPath, startIdx) {
+  const songs = [];
+  if (!fs.existsSync(dirPath)) {
+    console.warn(`[Scanner] Music dir ${dirPath} not found.`);
+    return songs;
   }
 
+  const files = fs.readdirSync(dirPath)
+    .filter(f => f.toLowerCase().endsWith(".mp3"))
+    .sort((a, b) => {
+      const numA = parseInt(a.match(/^(\d+)/)?.[1] || "0", 10);
+      const numB = parseInt(b.match(/^(\d+)/)?.[1] || "0", 10);
+      return numA - numB;
+    });
+
+  files.forEach((file, idx) => {
+    const cleanName = path.basename(file, ".mp3");
+    const title = cleanName.replace(/^\d+\.\s*/, "");
+
+    songs.push({
+      id: `SNG_${String(startIdx + idx + 1).padStart(3, "0")}`,
+      title,
+      artist: guessArtist(cleanName, folderKey),
+      album: folderKey === "nfak" ? "NFAK — Sufi & Qawwali" : "Bollywood Hits",
+      duration: "4:15",
+      fileName: file,
+      folder: folderKey,
+      audio: buildAudioUrl(folderKey, file),
+      audioUrl: `/api/songs/stream/${folderKey}/${encodeURIComponent(file)}`,
+      genre: folderKey === "nfak" ? "Qawwali / Sufi" : (idx % 2 === 0 ? "Indie / Acoustic" : "Bollywood Romantic"),
+      bpm: 95 + ((startIdx + idx) * 3) % 40,
+      releaseYear: 2015 + ((startIdx + idx) % 9),
+      lyrics: matchLyrics(cleanName)
+    });
+  });
+
+  return songs;
+}
+
+export function scanLocalMusicFiles() {
+  const fuckUppSongs = scanFolder("fuckupp", MUSIC_FOLDERS.fuckupp, 0);
+  const nfakSongs = scanFolder("nfak", MUSIC_FOLDERS.nfak, fuckUppSongs.length);
+  const songsList = [...fuckUppSongs, ...nfakSongs];
+
+  console.log(`[Scanner] Indexed ${songsList.length} tracks (${fuckUppSongs.length} Fuck upp + ${nfakSongs.length} NFAK)`);
   return songsList;
 }
