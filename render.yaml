@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: music-mobile-api
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd server && npm install
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MUSIC_DIR_FUCKUPP
+        sync: false
+      - key: MUSIC_DIR_NFAK
+        sync: false
