@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Sliders, Activity, Disc, Sparkles, Volume2 } from "lucide-react";
 import "./EqualizerBox.css";
+
+const BAR_COUNT = 24;
 
 function EqualizerBox({ activeSong, isPlaying }) {
   const [bassBoost, setBassBoost] = useState(true);
   const [spatialAudio, setSpatialAudio] = useState(false);
   const [highClarity, setHighClarity] = useState(true);
 
+  const barHeights = useMemo(
+    () => Array.from({ length: BAR_COUNT }, (_, i) => 25 + ((i * 17 + 13) % 55)),
+    [activeSong?.id]
+  );
+
   return (
     <div className="equalizer-container">
-      {/* Header */}
       <div className="eq-header">
         <div className="eq-title">
           <Activity size={16} className="eq-icon pulsing" />
@@ -21,21 +27,33 @@ function EqualizerBox({ activeSong, isPlaying }) {
         </div>
       </div>
 
-      {/* Visualizer Spectrum Bars */}
-      <div className="eq-visualizer">
-        {[40, 75, 55, 90, 60, 30, 85, 95, 50, 70, 45, 80, 65, 90, 40, 75, 60, 85].map((h, i) => (
-          <div
-            key={i}
-            className={`eq-bar ${isPlaying ? "animating" : ""}`}
-            style={{
-              height: isPlaying ? `${Math.floor(Math.random() * 60) + 30}%` : `${h / 2}%`,
-              animationDelay: `${(i % 5) * 0.15}s`
-            }}
-          />
-        ))}
+      <div className="eq-visualizer eq-visualizer--wave">
+        <div className="eq-visualizer-glow" />
+        <div className="eq-bars-container">
+          {barHeights.map((h, i) => (
+            <div key={i} className="eq-bar-group">
+              <div
+                className={`eq-bar eq-bar--top ${isPlaying ? "animating" : ""}`}
+                style={{
+                  height: isPlaying ? `${h}%` : `${h * 0.45}%`,
+                  animationDelay: `${(i % 6) * 0.12}s`,
+                  "--bar-hue": `${240 + (i * 8) % 80}`,
+                }}
+              />
+              <div
+                className={`eq-bar eq-bar--bottom ${isPlaying ? "animating" : ""}`}
+                style={{
+                  height: isPlaying ? `${h * 0.6}%` : `${h * 0.25}%`,
+                  animationDelay: `${(i % 6) * 0.12 + 0.06}s`,
+                  "--bar-hue": `${240 + (i * 8) % 80}`,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="eq-visualizer-baseline" />
       </div>
 
-      {/* Song Metadata Grid */}
       <div className="eq-stats-grid">
         <div className="stat-card">
           <span className="stat-label">Genre</span>
@@ -55,9 +73,9 @@ function EqualizerBox({ activeSong, isPlaying }) {
         </div>
       </div>
 
-      {/* Quick Audio Controls / Enhancements */}
       <div className="eq-controls-row">
         <button
+          type="button"
           className={`eq-toggle-btn ${bassBoost ? "active" : ""}`}
           onClick={() => setBassBoost(!bassBoost)}
         >
@@ -66,6 +84,7 @@ function EqualizerBox({ activeSong, isPlaying }) {
         </button>
 
         <button
+          type="button"
           className={`eq-toggle-btn ${spatialAudio ? "active" : ""}`}
           onClick={() => setSpatialAudio(!spatialAudio)}
         >
@@ -74,6 +93,7 @@ function EqualizerBox({ activeSong, isPlaying }) {
         </button>
 
         <button
+          type="button"
           className={`eq-toggle-btn ${highClarity ? "active" : ""}`}
           onClick={() => setHighClarity(!highClarity)}
         >

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Music, Lock, Mail, User, ArrowRight, ShieldCheck } from "lucide-react";
+import { apiUrl } from "@/config/api";
 import "./Login.css";
 
 function Login() {
@@ -15,7 +16,7 @@ function Login() {
     setErrorMsg("");
     setLoading(true);
 
-    const endpoint = isSignUp ? "http://localhost:5000/api/auth/register" : "http://localhost:5000/api/auth/login";
+    const endpoint = isSignUp ? apiUrl("/api/auth/register") : apiUrl("/api/auth/login");
 
     try {
       const response = await fetch(endpoint, {

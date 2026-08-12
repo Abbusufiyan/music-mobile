@@ -9,31 +9,47 @@ import PlaylistSection from "@/components/ui/PlaylistSection";
 import BigMusicPlayer from "@/components/ui/BigMusicPlayer";
 import EqualizerBox from "@/components/ui/EqualizerBox";
 import LyricsBox from "@/components/ui/LyricsBox";
+import MainBoxPanel from "@/components/ui/MainBoxPanel";
 
 import { LOCAL_SONGS_LIST, TRENDING_SONGS } from "@/data/songs";
+import { apiUrl, resolveAudioUrl } from "@/config/api";
 import "./Home.css";
 
 const Home = () => {
   const [songsList, setSongsList] = useState(LOCAL_SONGS_LIST);
   const [activeSongIndex, setActiveSongIndex] = useState(0);
   const [searchVal, setSearchVal] = useState("");
-  const [activeSidebarTab, setActiveSidebarTab] = useState(0);
+  const [activeSidebarTab, setActiveSidebarTab] = useState(null);
+  const [mainView, setMainView] = useState(null);
 
-  // Fetch local songs from backend API if running
   useEffect(() => {
-    fetch("http://localhost:5000/api/songs")
+    fetch(apiUrl("/api/songs"))
       .then((res) => res.json())
       .then((data) => {
         if (data && data.songs && data.songs.length > 0) {
-          setSongsList(data.songs);
+          const merged = data.songs.map((apiSong) => {
+            const local = LOCAL_SONGS_LIST.find(
+              (s) => s.id === apiSong.id || s.title === apiSong.title
+            );
+            const audio = resolveAudioUrl(
+              apiSong.audio || apiSong.audioUrl || local?.audio
+            );
+
+            return {
+              ...(local || {}),
+              ...apiSong,
+              audio,
+              cover: local?.cover || apiSong.cover,
+            };
+          });
+          setSongsList(merged);
         }
       })
-      .catch((err) => {
+      .catch(() => {
         console.log("Using local offline song dataset fallback.");
       });
   }, []);
 
-  // Filter songs based on search input
   const filteredSongs = searchVal.trim() === ""
     ? songsList
     : songsList.filter(s =>
@@ -42,8 +58,6 @@ const Home = () => {
       );
 
   const activeSong = filteredSongs[activeSongIndex] || filteredSongs[0] || songsList[0];
-
-  // Song titles for the 3D Option Wheel
   const likedSongTitles = filteredSongs.map(s => s.title);
 
   const handleWheelChange = (index) => {
@@ -61,34 +75,38 @@ const Home = () => {
   };
 
   const handlePlaySongDirectly = (song) => {
-    const idx = filteredSongs.findIndex(s => s.id === song.id || s.title === song.title);
+    const idx = filteredSongs.findIndex(
+      (s) => s.id === song.id || s.title === song.title || s.title === song.songName
+    );
     if (idx !== -1) setActiveSongIndex(idx);
   };
 
+  const handleSidebarClick = (idx) => {
+    setActiveSidebarTab(idx);
+    setMainView(idx);
+  };
+
+  const handleBackToHome = () => {
+    setMainView(null);
+    setActiveSidebarTab(null);
+  };
+
+  const mapSongForCard = (s) => ({
+    id: s.id,
+    title: s.title,
+    songName: s.title,
+    author: s.artist,
+    image: s.cover,
+  });
+
   return (
     <div className="home-main">
-      {/* NAVBAR */}
       <Navbar searchVal={searchVal} onSearchChange={setSearchVal} />
 
-      {/* DASHBOARD GRID */}
       <main className="dashboard">
 
-        {/* ================= LEFT COLUMN ================= */}
         <section className="left-column">
-
-          {/* SMALL MUSIC PLAYER (TRENDING LOCAL SONGS) */}
-          <BgBox
-            style={{
-              width: "100%",
-              height: "150px",
-              backgroundColor: "#1e252a",
-              borderRadius: "14px",
-              padding: "16px",
-              color: "white",
-              position: "relative",
-              border: "1px solid rgba(255, 255, 255, 0.08)"
-            }}
-          >
+          <BgBox className="home-box home-box--player">
             <div className="small-player">
               <MusicPlayer
                 trendingList={TRENDING_SONGS}
@@ -97,21 +115,8 @@ const Home = () => {
             </div>
           </BgBox>
 
-          {/* OPTION WHEEL (LOCAL LIKED SONGS LIST) */}
-          <BgBox
-            style={{
-              width: "100%",
-              height: "350px",
-              backgroundColor: "#1e252a",
-              borderRadius: "14px",
-              padding: "16px",
-              color: "white",
-              position: "relative",
-              border: "1px solid rgba(255, 255, 255, 0.08)"
-            }}
-          >
+          <BgBox className="home-box home-box--wheel">
             <div className="wheel-content">
-              {/* LEFT VERTICAL TEXT */}
               <div className="wheel-text">
                 <ShinyText
                   text="MY TRACKS"
@@ -124,7 +129,6 @@ const Home = () => {
                 />
               </div>
 
-              {/* WHEEL DISPLAYING LOCAL SONG NAMES */}
               <div className="option-wheel">
                 <OptionWheel
                   items={likedSongTitles}
@@ -137,19 +141,7 @@ const Home = () => {
             </div>
           </BgBox>
 
-          {/* SIDEBAR NAVIGATION */}
-          <BgBox
-            style={{
-              width: "100%",
-              height: "284px",
-              backgroundColor: "#1e252a",
-              borderRadius: "14px",
-              padding: "16px",
-              color: "white",
-              position: "relative",
-              border: "1px solid rgba(255, 255, 255, 0.08)"
-            }}
-          >
+          <BgBox className="home-box home-box--sidebar">
             <LineSidebar
               items={[
                 "My Favorites",
@@ -174,46 +166,45 @@ const Home = () => {
               fontSize={1.1}
               smoothing={100}
               defaultActive={activeSidebarTab}
-              onItemClick={(idx) => setActiveSidebarTab(idx)}
+              onItemClick={handleSidebarClick}
             />
           </BgBox>
-
         </section>
 
-        {/* ================= MAIN CONTENT (CENTER) ================= */}
         <section className="main-content">
-          <BgBox
-            style={{
-              width: "100%",
-              height: "814px",
-              backgroundColor: "#1e252a",
-              borderRadius: "14px",
-              padding: "20px",
-              color: "white",
-              position: "relative",
-              border: "1px solid rgba(255, 255, 255, 0.08)"
-            }}
-          >
+          <BgBox className="home-box home-box--main">
             <div className="main-box">
-              <PlaylistSection
-                title="My Playlist"
-                songs={filteredSongs.slice(0, 4).map(s => ({ id: s.id, songName: s.title, author: s.artist, image: s.cover }))}
-                onSelectSong={handlePlaySongDirectly}
-              />
+              {mainView !== null ? (
+                <MainBoxPanel
+                  viewIndex={mainView}
+                  songs={filteredSongs}
+                  trendingSongs={TRENDING_SONGS}
+                  onBack={handleBackToHome}
+                  onSelectSong={handlePlaySongDirectly}
+                />
+              ) : (
+                <>
+                  <PlaylistSection
+                    title="My Playlist"
+                    songs={filteredSongs.slice(0, 4).map(mapSongForCard)}
+                    onSelectSong={handlePlaySongDirectly}
+                  />
 
-              <PlaylistSection
-                title="Most Played Hits"
-                songs={filteredSongs.slice(4, 8).map(s => ({ id: s.id, songName: s.title, author: s.artist, image: s.cover }))}
-                onSelectSong={handlePlaySongDirectly}
-              />
+                  <PlaylistSection
+                    title="Most Played Hits"
+                    songs={filteredSongs.slice(4, 8).map(mapSongForCard)}
+                    onSelectSong={handlePlaySongDirectly}
+                  />
+                </>
+              )}
 
               <BigMusicPlayer
-                image={activeSong.cover}
-                songName={activeSong.title}
-                author={activeSong.artist}
-                duration={activeSong.duration}
-                audio={activeSong.audio || activeSong.fallbackAudio}
-                lyrics={activeSong.lyrics}
+                image={activeSong?.cover}
+                songName={activeSong?.title}
+                author={activeSong?.artist}
+                duration={activeSong?.duration}
+                audio={activeSong?.audio || activeSong?.fallbackAudio}
+                lyrics={activeSong?.lyrics}
                 onNext={handleNextSong}
                 onPrev={handlePrevSong}
               />
@@ -221,42 +212,15 @@ const Home = () => {
           </BgBox>
         </section>
 
-        {/* ================= RIGHT COLUMN (2-PARTS: EQUALIZER + LYRICS) ================= */}
         <section className="right-column">
           <div className="right-column-container">
-
-            {/* PART 1: EQUALIZER / VISUALIZER / SONG STATS (TOP) */}
-            <BgBox
-              style={{
-                width: "100%",
-                height: "395px",
-                backgroundColor: "#1e252a",
-                borderRadius: "14px",
-                padding: "16px",
-                color: "white",
-                position: "relative",
-                border: "1px solid rgba(255, 255, 255, 0.08)"
-              }}
-            >
+            <BgBox className="home-box home-box--eq">
               <EqualizerBox activeSong={activeSong} isPlaying={true} />
             </BgBox>
 
-            {/* PART 2: LYRICS BOX FOR ACTIVE SONG (BOTTOM) */}
-            <BgBox
-              style={{
-                width: "100%",
-                height: "404px",
-                backgroundColor: "#1e252a",
-                borderRadius: "14px",
-                padding: "16px",
-                color: "white",
-                position: "relative",
-                border: "1px solid rgba(255, 255, 255, 0.08)"
-              }}
-            >
+            <BgBox className="home-box home-box--lyrics">
               <LyricsBox activeSong={activeSong} />
             </BgBox>
-
           </div>
         </section>
 

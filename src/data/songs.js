@@ -3,8 +3,9 @@
 
 import baarishCover from "../assets/image.png";
 import heroCover from "../assets/hero.png";
+import { apiUrl } from "../config/api.js";
 
-const BASE_STREAM = "http://localhost:5000/api/songs/stream";
+const BASE_STREAM = apiUrl("/api/songs/stream");
 
 // Curated short lyrics (placeholder — real lyrics at lyrics_url in JSON)
 const LYRICS_MAP = {

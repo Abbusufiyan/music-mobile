@@ -1,8 +1,8 @@
 import React from "react";
 
-const BgBox = ({ children, style }) => {
+const BgBox = ({ children, style, className = "" }) => {
   return (
-    <div style={style}>
+    <div style={style} className={className}>
       {children}
     </div>
   );

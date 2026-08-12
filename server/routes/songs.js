@@ -1,23 +1,30 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { scanLocalMusicFiles, LOCAL_MUSIC_DIR } from "../services/musicScanner.js";
+import { scanLocalMusicFiles, MUSIC_FOLDERS } from "../services/musicScanner.js";
 import { localDbFallback } from "../config/db.js";
 
 const router = express.Router();
 
-// GET ALL SONGS (Index local files from /home/omr/Music/Fuck upp/)
-router.get("/", (req, res) => {
-  const songs = scanLocalMusicFiles();
-  res.json({ songs, total: songs.length });
-});
+const MUSIC_DIRS = MUSIC_FOLDERS;
 
-// STREAM LOCAL MP3 FILE
-router.get("/stream/:filename", (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(LOCAL_MUSIC_DIR, filename);
+function resolveMusicFile(folder, filename) {
+  const decoded = decodeURIComponent(filename);
+  if (folder) {
+    const dir = MUSIC_DIRS[folder.toLowerCase()];
+    if (!dir) return null;
+    return path.join(dir, decoded);
+  }
+  // Legacy single-segment route: try Fuck upp first, then NFAK
+  for (const dir of Object.values(MUSIC_DIRS)) {
+    const candidate = path.join(dir, decoded);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
 
-  if (!fs.existsSync(filePath)) {
+function streamAudioFile(req, res, filePath) {
+  if (!filePath || !fs.existsSync(filePath)) {
     return res.status(404).json({ error: "Local audio file not found." });
   }
 
@@ -43,10 +50,29 @@ router.get("/stream/:filename", (req, res) => {
     const head = {
       "Content-Length": fileSize,
       "Content-Type": "audio/mpeg",
+      "Accept-Ranges": "bytes",
     };
     res.writeHead(200, head);
     fs.createReadStream(filePath).pipe(res);
   }
+}
+
+// GET ALL SONGS
+router.get("/", (req, res) => {
+  const songs = scanLocalMusicFiles();
+  res.json({ songs, total: songs.length });
+});
+
+// STREAM: /api/songs/stream/:folder/:filename  (e.g. fuckupp or nfak)
+router.get("/stream/:folder/:filename", (req, res) => {
+  const filePath = resolveMusicFile(req.params.folder, req.params.filename);
+  streamAudioFile(req, res, filePath);
+});
+
+// STREAM: /api/songs/stream/:filename  (legacy — searches both folders)
+router.get("/stream/:filename", (req, res) => {
+  const filePath = resolveMusicFile(null, req.params.filename);
+  streamAudioFile(req, res, filePath);
 });
 
 // TOGGLE LIKE

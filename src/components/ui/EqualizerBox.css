@@ -63,21 +63,93 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.eq-bar {
+.eq-visualizer--wave {
+  position: relative;
+  height: 100px;
+  padding: 16px 18px 20px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(99, 102, 241, 0.25) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 37, 42, 0.95) 100%);
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.eq-visualizer-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.eq-bars-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  height: 100%;
+}
+
+.eq-bar-group {
   flex: 1;
-  background: linear-gradient(180deg, #a855f7 0%, #6366f1 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 2px;
+}
+
+.eq-bar {
+  width: 100%;
+  max-width: 8px;
   border-radius: 4px;
   transition: height 0.3s ease;
-  min-height: 4px;
+  min-height: 3px;
+}
+
+.eq-bar--top {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--bar-hue, 260), 85%, 75%) 0%,
+    hsl(var(--bar-hue, 260), 70%, 55%) 100%
+  );
+  box-shadow: 0 0 8px hsla(var(--bar-hue, 260), 80%, 60%, 0.5);
+  transform-origin: bottom center;
+}
+
+.eq-bar--bottom {
+  background: linear-gradient(
+    0deg,
+    hsl(var(--bar-hue, 260), 85%, 75%) 0%,
+    hsl(var(--bar-hue, 260), 70%, 55%) 100%
+  );
+  box-shadow: 0 0 8px hsla(var(--bar-hue, 260), 80%, 60%, 0.5);
+  transform-origin: top center;
+  opacity: 0.7;
 }
 
 .eq-bar.animating {
-  animation: barBounce 0.8s infinite ease-in-out alternate;
+  animation: waveBounce 0.9s infinite ease-in-out alternate;
 }
 
-@keyframes barBounce {
-  0% { transform: scaleY(0.4); }
-  100% { transform: scaleY(1.1); }
+@keyframes waveBounce {
+  0% { transform: scaleY(0.35); opacity: 0.6; }
+  100% { transform: scaleY(1.15); opacity: 1; }
+}
+
+.eq-visualizer-baseline {
+  position: absolute;
+  bottom: 18px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.5), transparent);
+  z-index: 0;
 }
 
 .eq-stats-grid {
